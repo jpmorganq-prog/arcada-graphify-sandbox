@@ -4,6 +4,9 @@ on:
     branches:
       - experiment/kdense-science-skills-20261025
   workflow_dispatch:
+concurrency:
+  group: kdense-science-${{ github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:
@@ -34,7 +37,7 @@ jobs:
           CODEX_HOME: ${{ runner.temp }}/arcada-codex-home
         run: |
           mkdir -p "$CODEX_HOME"
-          npm install --global @openai/codex@latest
+          npm install --global @openai/codex@0.164.0
           codex --version
           node test/codex_skill_discovery.mjs
       - name: Archive synthetic design for inspection
