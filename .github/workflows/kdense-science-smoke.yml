@@ -3,6 +3,10 @@ on:
   push:
     branches:
       - experiment/kdense-science-skills-20261025
+      - main
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 concurrency:
   group: kdense-science-${{ github.ref }}
