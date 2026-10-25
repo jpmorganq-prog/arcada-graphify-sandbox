@@ -1,0 +1,53 @@
+name: Isolated K-Dense scientific skills smoke
+on:
+  push:
+    branches:
+      - experiment/kdense-science-skills-20261025
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+concurrency:
+  group: kdense-science-${{ github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: read
+jobs:
+  scientific-skills:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: test/scientific-skills-requirements.txt
+      - name: Install scientific dependencies
+        run: python -m pip install --disable-pip-version-check -r test/scientific-skills-requirements.txt
+      - name: Compile vendored Python sources
+        run: python -m compileall -q .agents/skills/
+      - name: Run baseline functional smoke checks
+        run: python test/scientific_skills_smoke.py
+      - name: Run synthetic R812 versus R972 design
+        run: python test/lb_synthetic_doe.py
+      - name: Set up Node.js for Codex app-server
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install actual Codex CLI and verify skill discovery
+        env:
+          CODEX_HOME: ${{ runner.temp }}/arcada-codex-home
+        run: |
+          mkdir -p "$CODEX_HOME"
+          npm install --global @openai/codex@0.164.0
+          codex --version
+          node test/codex_skill_discovery.mjs
+      - name: Archive synthetic design for inspection
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: arcada-synthetic-lb-doe
+          path: out/synthetic_lb_doe.csv
+          if-no-files-found: warn
