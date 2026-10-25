@@ -36,3 +36,21 @@ Confirm that the Codex skill discovery mechanism loads all three skills in this 
 - No API keys, production data, workflow secrets or private files needed for the tests.
 - Do not merge or deploy this branch without review.
 - Revert by returning the workspace to its earlier branch; delete the test branch after acceptance if no longer needed.
+
+
+## Extended verification (2026-10-25)
+- Actual Codex CLI version: **0.164.0** (verified from GitHub Actions logs).
+- Actual Codex app-server `initialize` succeeded, then `skills/list` with `forceReload=true` returned **all three project-scoped skills** with expected paths and without scan errors.
+- This test deliberately did **not** call `thread/start` or `turn/start`; no LLM inference or account authorization was used.
+- Additional generated synthetic Light Body plan: 8 conditions, 2 independently prepared batches per condition, 16 total batches, 3 repeat measurements linked to each batch. Illustrative BET values are never claimed to be source-verified.
+- Proof run: https://github.com/jpmorganq-prog/arcada-graphify-sandbox/actions/runs/40181944950
+- Executable source: `test/codex_skill_discovery.mjs`, `test/lb_synthetic_doe.py`.
+- Experiment assumptions and acceptance plan: `VPS_LB_SYNTHETIC_TEST_PLAN_2026-10-25.md`.
+- `AGENTS.md` limits Codex agents in this branch to synthetic test data.
+- GitHub CI now pins Codex CLI 0.164.0 and cancels redundant concurrent branch builds.
+
+### Remaining limitations
+- Skill discovery is **not** proof that a signed-in user's Codex model selected/executed each skill as an agent in the user's personal Codex workspace. This connector currently offers no action to switch the user's hosted Codex workspace or perform an authenticated model turn.
+- Graphify's indexed default-branch graph does not include this trial branch; do not describe it as validating the newly copied skills.
+- Neither this test nor the K-Dense documentation establishes real product improvements or a validated VPS formulation.
+- Working ARCADA portal, `main`, Neon, Render, Auth0 and real recipes were left unchanged.
